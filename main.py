@@ -2,7 +2,9 @@ from djitellopy import Tello
 import threading
 import queue
 
-def 
+def worker():
+    while True:
+        
 
 
 def main():
