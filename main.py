@@ -17,7 +17,7 @@ class tello_class:
         while True:
             pass
 
-    def start_done(self):
+    def start_drone(self):
         try:
             self.tello.connect()
         except Exception:
@@ -27,7 +27,7 @@ class tello_class:
         tello = Tello()
         thread = threading.Thread(target=self.worker,daemon=True)
         thread.start()
-        tello.connect()
+        self.start_drone()
         
 
 
