@@ -5,7 +5,7 @@ import socket
 
 
 class tello_class:
-
+    command_queue = queue.Queue()
     def __init__(self):
         self.tello = Tello()
         self.tello.connect()
@@ -22,7 +22,12 @@ class tello_class:
             self.tello.connect()
         except Exception:
             return Exception
-        
+
+    def drone_commands(self):
+        while True:
+            command = self.command_queue.get()
+             
+
     def main(self):
         tello = Tello()
         thread = threading.Thread(target=self.worker,daemon=True)
