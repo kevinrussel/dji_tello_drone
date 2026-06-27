@@ -19,7 +19,7 @@ class tello_class:
 
 
     def main(self):
-        print("hello world")
+       
         tello = Tello()
         thread = threading.Thread()
         tello.connect()
