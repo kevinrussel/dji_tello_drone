@@ -27,7 +27,7 @@ class tello_class:
 
         udp_server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF, 4 * 1024 * 1024)
         udp_server_socket.bind(('',8080))
-        udp_server_listen()
+        self.udp_server_listen()
 
 
 drone = tello_class()
