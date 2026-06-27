@@ -22,8 +22,8 @@ class tello_class:
             self.tello.connect()
         except Exception:
             return Exception
+        
     def main(self):
-       
         tello = Tello()
         thread = threading.Thread(target=self.worker,daemon=True)
         thread.start()
