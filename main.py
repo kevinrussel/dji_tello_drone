@@ -17,7 +17,11 @@ class tello_class:
         while True:
             pass
 
-
+    def start_done(self):
+        try:
+            self.tello.connect()
+        except Exception:
+            return Exception
     def main(self):
        
         tello = Tello()
