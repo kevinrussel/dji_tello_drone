@@ -26,6 +26,8 @@ class tello_class:
     def drone_commands(self):
         while True:
             command = self.command_queue.get()
+            if command is None:
+                break
              
 
     def main(self):
