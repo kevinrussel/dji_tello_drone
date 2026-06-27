@@ -13,7 +13,7 @@ class tello_class:
         self.udp_server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF, 4 * 1024 * 1024)
         self.udp_server_socket.bind(('',8080))
 
-    def worker():
+    def worker(self):
         while True:
             pass
 
@@ -21,6 +21,7 @@ class tello_class:
     def main(self):
         print("hello world")
         tello = Tello()
+        thread = threading.Thread()
         tello.connect()
         
 
