@@ -21,7 +21,8 @@ class tello_class:
     def main(self):
        
         tello = Tello()
-        thread = threading.Thread()
+        thread = threading.Thread(target=self.worker,daemon=True)
+        thread.start()
         tello.connect()
         
 
