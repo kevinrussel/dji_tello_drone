@@ -29,16 +29,28 @@ def test1_takeoff():
     pass
 
 def test2_altitude():
+    header = create_header("takeoff")
+    command = b"takeoff"
+    message = header + command
+    udp_client_socket.sendto(message,(server_address,port))
+    time.sleep(10)
     header = create_header("up")
     command = b"up"
     message = header + command
     udp_client_socket.sendto(message,(server_address,port))
-    time.sleep(5)
-    header = create_header("land")
+    time.sleep(10)
+
+    header = create_header("up")
+    command = b"up"
+    message = header + command
+    udp_client_socket.sendto(message,(server_address,port))
+    time.sleep(10)
+    header = create_header("up")
     command = b"land"
     message = header + command
     udp_client_socket.sendto(message,(server_address,port))
     pass
 
 
-test1_takeoff()
+# test1_takeoff()
+test2_altitude()
