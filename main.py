@@ -27,9 +27,8 @@ class tello_class:
         header = message[:8]
         timestamp = struct.unpack("!d", header)
         timestamp = time.time() - timestamp
-        message = (message[8:]).decode("utf-8")
-                   
-        return packet_num,timestamp,message 
+        header_message = (message[8:]).decode("utf-8")          
+        return timestamp,header_message 
 
     def drone_commands(self):
         while True:
