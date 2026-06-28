@@ -19,6 +19,7 @@ class tello_class:
         while True:
             message,address = self.udp_server_socket.recvfrom(100)
             message = (self.deal_with_header(message)).split()
+            self.command_queue.put(message)
             
     def start_drone(self):
         try:
