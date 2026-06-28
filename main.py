@@ -42,6 +42,8 @@ class tello_class:
             else:
                 if(command == "takeoff"):
                     self.tello.take()
+                elif command == "land":
+                    self.tello.land()
                 else:
                     direction = command[0]
                     distance = command[1]
