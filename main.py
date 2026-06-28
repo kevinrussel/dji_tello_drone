@@ -60,3 +60,4 @@ class tello_class:
 
 
 drone = tello_class()
+drone.main()
