@@ -17,11 +17,11 @@ def takeoff_test():
     pass
 
 def create_header(flag):
-    timestamp = time.time()
+    timestamp = time.time_ns()
     if(flag == "land" or flag == "takeoff"):
         command_type = b's'
     else:
-        command_type = b'd'
+        command_type = b'Q'
     header = struct.pack('!dc',timestamp,command_type)
     return header
 

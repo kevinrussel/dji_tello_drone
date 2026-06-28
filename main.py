@@ -19,6 +19,9 @@ class tello_class:
         while True:
             message,address = self.udp_server_socket.recvfrom(100)
             timestamp,command_type,header_message =(self.deal_with_packet(message))
+            print("hello")
+            print(timestamp)
+            print(self.last_known_time)
             if timestamp > self.last_known_time:
                 message = [command_type,header_message]
                 print(message)
@@ -34,7 +37,7 @@ class tello_class:
 
     def deal_with_packet(self,message):
         header = message[:9]
-        timestamp,command_type = struct.unpack("!dc", header)
+        timestamp,command_type = struct.unpack("!Qc", header)
         command_type = command_type.decode("utf-8")
         timestamp = time.time() - timestamp
         header_message = (message[9:]).decode("utf-8")          
