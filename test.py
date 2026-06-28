@@ -4,7 +4,7 @@ import struct
 udp_client_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 server_address = "192.168.10.2"
 port = 8080
-def takeoff_test():
+def test1_takeoff():
     header = create_header("takeoff")
     command = b"takeoff"
     message = header + command
@@ -24,5 +24,4 @@ def create_header(flag):
         command_type = b'd'
     header = struct.pack('!Qc',timestamp,command_type)
     return header
-
-takeoff_test()
+test1_takeoff()
