@@ -16,9 +16,13 @@ def takeoff_test():
     udp_client_socket.sendto(message,(server_address,port))
     pass
 
-def create_header():
+def create_header(flag):
     timestamp = time.time()
-    header = struct.pack('!d',timestamp)
+    if(flag == "land" or flag == "takeoff"):
+        command_type = 's'
+    else:
+        command_type = 'd'
+    header = struct.pack('!dc',timestamp,command_type)
     return header
 
 takeoff_test()
