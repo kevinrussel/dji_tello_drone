@@ -41,7 +41,7 @@ class tello_class:
                 break
             else:
                 if(command == "takeoff"):
-                    self.tello.take()
+                    self.tello.takeoff()
                 elif command == "land":
                     self.tello.land()
                 else:
