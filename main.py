@@ -30,6 +30,7 @@ class tello_class:
     def deal_with_header(self,message):
         header = message[:8]
         timestamp = struct.unpack("!d", header)
+        print(timestamp)
         timestamp = time.time() - timestamp
         header_message = (message[8:]).decode("utf-8")          
         return timestamp,header_message 
