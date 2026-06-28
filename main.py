@@ -20,7 +20,7 @@ class tello_class:
             message,address = self.udp_server_socket.recvfrom(100)
             timestamp,command_type,header_message =(self.deal_with_packet(message))
             if timestamp > self.last_known_time:
-                print(message)
+                message = [command_type,header_message]
                 self.command_queue.put(message)
             else:
                 continue
