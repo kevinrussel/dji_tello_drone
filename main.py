@@ -39,7 +39,6 @@ class tello_class:
         header = message[:9]
         timestamp,command_type = struct.unpack("!Qc", header)
         command_type = command_type.decode("utf-8")
-        timestamp = time.time_ns() - timestamp
         header_message = (message[9:]).decode("utf-8")          
         return timestamp,command_type,header_message 
 
