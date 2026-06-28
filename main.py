@@ -3,7 +3,7 @@ import threading
 import queue
 import socket
 import struct
-
+import time
 class tello_class:
     command_queue = queue.Queue()
     def __init__(self):
