@@ -12,7 +12,7 @@ class tello_class:
         self.udp_server_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         self.udp_server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF, 4 * 1024 * 1024)
         self.udp_server_socket.bind(('',8080))
-
+        self.last_known_time = time.time_ns()
     def worker(self):
         while True:
             pass
@@ -24,10 +24,10 @@ class tello_class:
             return Exception
 
     def deal_with_header(self,message):
-        header = message[:10]
-        packet_num,timestamp = struct.unpack("!Hd", header)
+        header = message[:8]
+        timestamp = struct.unpack("!d", header)
         timestamp = time.time() - timestamp
-        message = (message[10:]).decode("utf-8")
+        message = (message[8:]).decode("utf-8")
                    
         return packet_num,timestamp,message 
 
