@@ -28,11 +28,11 @@ class tello_class:
             return Exception
 
     def deal_with_header(self,message):
-        header = message[:8]
-        timestamp = struct.unpack("!d", header)
+        header = message[:9]
+        timestamp,command_type = struct.unpack("!dc", header)
         print(timestamp)
         timestamp = time.time() - timestamp
-        header_message = (message[8:]).decode("utf-8")          
+        header_message = (message[9:]).decode("utf-8")          
         return timestamp,header_message 
 
     def drone_commands(self):
