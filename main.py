@@ -44,6 +44,9 @@ class tello_class:
             if command is None:
                 break
             else:
+                command_type = command[0]
+                command = command[1]
+                if(command_type == 's')
                 if(command == "takeoff"):
                     self.tello.takeoff()
                 elif command == "land":
