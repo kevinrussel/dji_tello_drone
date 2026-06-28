@@ -19,6 +19,7 @@ class tello_class:
         while True:
             message,address = self.udp_server_socket.recvfrom(100)
             message = (self.deal_with_header(message)).split()
+            print(message)
             self.command_queue.put(message)
             
     def start_drone(self):
@@ -30,10 +31,9 @@ class tello_class:
     def deal_with_header(self,message):
         header = message[:9]
         timestamp,command_type = struct.unpack("!dc", header)
-        print(timestamp)
         timestamp = time.time() - timestamp
         header_message = (message[9:]).decode("utf-8")          
-        return timestamp,header_message 
+        return timestamp,command_type,header_message 
 
     def drone_commands(self):
         while True:
