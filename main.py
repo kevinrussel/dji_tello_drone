@@ -23,8 +23,13 @@ class tello_class:
             print(timestamp)
             print(self.last_known_time)
             if timestamp > self.last_known_time:
-                message = [command_type,header_message]
-                print(message)
+                if(command_type == 's'):
+
+                    message = [command_type,header_message]
+                    print(message)
+                else:
+                    command = header_message.split()
+                    message = [command_type,[command[0],command[1]]]
                 self.command_queue.put(message)
             else:
                 continue
