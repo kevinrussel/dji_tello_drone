@@ -28,7 +28,10 @@ class tello_class:
             command = self.command_queue.get()
             if command is None:
                 break
-             
+            else:
+                direction 
+                self.tello.move()
+
 
     def main(self):
         tello = Tello()
