@@ -2,7 +2,7 @@ from djitellopy import Tello
 import threading
 import queue
 import socket
-
+import struct
 
 class tello_class:
     command_queue = queue.Queue()
@@ -22,6 +22,14 @@ class tello_class:
             self.tello.connect()
         except Exception:
             return Exception
+
+    def deal_with_header(self,message):
+        header = message[:10]
+        packet_num,timestamp = struct.unpack("!Hd", header)
+        timestamp = time.time() - timestamp
+        message = (message[10:]).decode("utf-8")
+                   
+        return packet_num,timestamp,message 
 
     def drone_commands(self):
         while True:
