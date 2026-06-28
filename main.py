@@ -58,9 +58,7 @@ class tello_class:
                         self.tello.land()
                 ## TODO: FIX THIS   
                 elif (command_type == 'd'):
-                    direction = command[0]
-                    distance = command[1]
-                    self.tello.move(direction,distance)
+                    self.tello.move(command,1)
 
 
     def main(self):
