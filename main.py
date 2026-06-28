@@ -15,6 +15,7 @@ class tello_class:
         self.last_known_time = time.time_ns()
     def worker(self):
         while True:
+            message,address = self.udp_server_socket.recvfrom(100)
             pass
 
     def start_drone(self):
