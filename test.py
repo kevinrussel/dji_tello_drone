@@ -2,7 +2,7 @@ import time
 import socket
 import struct
 udp_client_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-server_address = "192.168.10.2"
+server_address = "192.168.10.3"
 port = 8080
 
 
@@ -38,14 +38,20 @@ def test2_altitude():
     command = b"up"
     message = header + command
     udp_client_socket.sendto(message,(server_address,port))
-    time.sleep(10)
-
+    header = create_header("up")
+    command = b"up"
+    message = header + command
+    udp_client_socket.sendto(message,(server_address,port))
+    header = create_header("left")
+    command = b"left"
+    message = header + command
+    udp_client_socket.sendto(message,(server_address,port))
     header = create_header("up")
     command = b"up"
     message = header + command
     udp_client_socket.sendto(message,(server_address,port))
     time.sleep(10)
-    header = create_header("up")
+    header = create_header("land")
     command = b"land"
     message = header + command
     udp_client_socket.sendto(message,(server_address,port))

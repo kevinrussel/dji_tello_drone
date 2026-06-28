@@ -19,9 +19,7 @@ class tello_class:
         while True:
             message,address = self.udp_server_socket.recvfrom(100)
             timestamp,command_type,header_message =(self.deal_with_packet(message))
-            print("hello")
-            print(timestamp)
-            print(self.last_known_time)
+            
             if timestamp > self.last_known_time:
                 
                 message = [command_type,header_message]
@@ -58,7 +56,8 @@ class tello_class:
                         self.tello.land()
                 ## TODO: FIX THIS   
                 elif (command_type == 'd'):
-                    self.tello.move(command,5)
+                    print("hitting")
+                    self.tello.move(command,25)
 
 
     def main(self):
