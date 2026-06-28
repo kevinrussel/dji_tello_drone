@@ -18,7 +18,7 @@ class tello_class:
     def worker(self):
         while True:
             message,address = self.udp_server_socket.recvfrom(100)
-            message = (self.deal_with_header(message)).split()
+            timestamp,command_type,header_message =(self.deal_with_packet(message))
             print(message)
             self.command_queue.put(message)
             
@@ -28,7 +28,7 @@ class tello_class:
         except Exception:
             return Exception
 
-    def deal_with_header(self,message):
+    def deal_with_packet(self,message):
         header = message[:9]
         timestamp,command_type = struct.unpack("!dc", header)
         timestamp = time.time() - timestamp
