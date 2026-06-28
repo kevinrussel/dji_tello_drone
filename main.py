@@ -34,6 +34,7 @@ class tello_class:
     def deal_with_packet(self,message):
         header = message[:9]
         timestamp,command_type = struct.unpack("!dc", header)
+        command_type = command_type.decode("utf-8")
         timestamp = time.time() - timestamp
         header_message = (message[9:]).decode("utf-8")          
         return timestamp,command_type,header_message 
@@ -46,12 +47,13 @@ class tello_class:
             else:
                 command_type = command[0]
                 command = command[1]
-                if(command_type == 's')
-                if(command == "takeoff"):
-                    self.tello.takeoff()
-                elif command == "land":
-                    self.tello.land()
-                else:
+                if(command_type == 's'):
+                    if(command == "takeoff"):
+                        self.tello.takeoff()
+                    elif command == "land":
+                        self.tello.land()
+                ## TODO: FIX THIS
+                elif (command_type == 'd'):
                     direction = command[0]
                     distance = command[1]
                     self.tello.move(direction,distance)
