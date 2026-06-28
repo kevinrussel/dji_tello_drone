@@ -40,9 +40,12 @@ class tello_class:
             if command is None:
                 break
             else:
-                direction = command[0]
-                distance = command[1]
-                self.tello.move(direction,distance)
+                if(command == "takeoff"):
+                    self.tello.take()
+                else:
+                    direction = command[0]
+                    distance = command[1]
+                    self.tello.move(direction,distance)
 
 
     def main(self):
@@ -50,6 +53,7 @@ class tello_class:
         thread = threading.Thread(target=self.worker,daemon=True)
         thread.start()
         self.start_drone()
+        self.drone_commands()
         
 
 
