@@ -21,6 +21,7 @@ class tello_class:
             timestamp,command_type,header_message =(self.deal_with_packet(message))
             if timestamp > self.last_known_time:
                 message = [command_type,header_message]
+                print(message)
                 self.command_queue.put(message)
             else:
                 continue
@@ -48,6 +49,7 @@ class tello_class:
                 command_type = command[0]
                 command = command[1]
                 if(command_type == 's'):
+                    print("hitting")
                     if(command == "takeoff"):
                         self.tello.takeoff()
                     elif command == "land":
