@@ -29,7 +29,8 @@ class tello_class:
             if command is None:
                 break
             else:
-                direction 
+                direction = command[0]
+                distance = command[1]
                 self.tello.move()
 
 
