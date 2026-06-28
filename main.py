@@ -31,7 +31,7 @@ class tello_class:
             else:
                 direction = command[0]
                 distance = command[1]
-                self.tello.move()
+                self.tello.move(direction,distance)
 
 
     def main(self):
