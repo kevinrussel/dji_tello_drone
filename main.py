@@ -13,11 +13,13 @@ class tello_class:
         self.udp_server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF, 4 * 1024 * 1024)
         self.udp_server_socket.bind(('',8080))
         self.last_known_time = time.time_ns()
+
+
     def worker(self):
         while True:
             message,address = self.udp_server_socket.recvfrom(100)
-            pass
-
+            message = (self.deal_with_header(message)).split()
+            
     def start_drone(self):
         try:
             self.tello.connect()
