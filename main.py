@@ -51,14 +51,15 @@ class tello_class:
                 command_type = command[0]
                 command = command[1]
                 if(command_type == 's'):
-                    print("hitting")
                     if(command == "takeoff"):
                         self.tello.takeoff()
                     elif command == "land":
-                        self.tello.land()
-                ## TODO: FIX THIS   
+                        self.tello.land()   
                 elif (command_type == 'd'):
-                    self.tello.move(command,5)
+                    if command == "down":
+                        self.tello.send_rc_control(0,0,-20,0)
+                    elif command == "up":
+                        self.tello.send_rc_control(0,0,20,0)
 
 
     def main(self):
