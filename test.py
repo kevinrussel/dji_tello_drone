@@ -65,7 +65,11 @@ def test2_altitude():
 
 
 def test3_up_and_down():
-    
+    header = create_header("takeoff")
+    command = b"takeoff"
+    message = header + command
+    udp_client_socket.sendto(message,(server_address,port))
+    time.sleep(10)
 
 
 
