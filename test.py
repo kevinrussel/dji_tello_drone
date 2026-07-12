@@ -45,7 +45,19 @@ def test2_altitude():
     message = header + command
     udp_client_socket.sendto(message,(server_address,port))
     time.sleep(5)
-    header = create_header("up")
+
+    header = create_header("down")
+    command = b"down"
+    message = header + command
+    udp_client_socket.sendto(message,(server_address,port))
+    time.sleep(5)
+
+    header = create_header("down")
+    command = b"down"
+    message = header + command
+    udp_client_socket.sendto(message,(server_address,port))
+    time.sleep(5)
+    header = create_header("land")
     command = b"land"
     message = header + command
     udp_client_socket.sendto(message,(server_address,port))
