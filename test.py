@@ -82,7 +82,10 @@ def test3_up_and_down():
         command = position.encode("utf-8")
         message = header + command
         udp_client_socket.sendto(message,(server_address,port))    
-    
+    header = create_header("land")
+    command = b"land"
+    message = header + command
+    udp_client_socket.sendto(message,(server_address,port))
 
 
 
