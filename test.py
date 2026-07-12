@@ -70,7 +70,6 @@ def test3_up_and_down():
     message = header + command
     udp_client_socket.sendto(message,(server_address,port))
     time.sleep(10)
-
     header = create_header("move")
     position ="up"
     for i in range(50):
@@ -93,5 +92,5 @@ def test3_up_and_down():
 
 
 # test1_takeoff()
-test2_altitude()
+# test2_altitude()
 test3_up_and_down()
