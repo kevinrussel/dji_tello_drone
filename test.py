@@ -71,6 +71,13 @@ def test3_up_and_down():
     udp_client_socket.sendto(message,(server_address,port))
     time.sleep(10)
 
+    header = create_header("move")
+    count = 0
+    while True:
+        
+
+
+
 
 
 
