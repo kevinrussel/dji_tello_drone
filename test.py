@@ -2,7 +2,7 @@ import time
 import socket
 import struct
 udp_client_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-server_address = "192.168.10.3"
+server_address = "192.168.10.2"
 port = 8080
 
 
@@ -64,5 +64,5 @@ def test2_altitude():
     pass
 
 
-test1_takeoff()
-# test2_altitude()
+# test1_takeoff()
+test2_altitude()
