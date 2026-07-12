@@ -73,17 +73,16 @@ def test3_up_and_down():
 
     header = create_header("move")
     position ="up"
-    count = 0
     for i in range(50):
         if(i % 10 == 0):
             if(position == "up"):
                 position = "down"
             else:
                 position = "up"
-        command = b"down"
+        command = position.encode("utf-8")
         message = header + command
         udp_client_socket.sendto(message,(server_address,port))    
-
+    
 
 
 
