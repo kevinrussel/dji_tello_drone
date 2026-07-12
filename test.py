@@ -94,3 +94,4 @@ def test3_up_and_down():
 
 # test1_takeoff()
 test2_altitude()
+test3_up_and_down()
