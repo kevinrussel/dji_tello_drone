@@ -55,9 +55,10 @@ class tello_class:
                         self.tello.land()   
                 elif (command_type == 'd'):
                     if command == "down":
-                        self.tello.send_rc_control(0,0,-20,0)
+                        print("hitting")
+                        self.tello.send_rc_control(0,0,-80,0)
                     elif command == "up":
-                        self.tello.send_rc_control(0,0,20,0)
+                        self.tello.send_rc_control(0,0,80,0)
 
 
     def main(self):

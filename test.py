@@ -2,7 +2,7 @@ import time
 import socket
 import struct
 udp_client_socket = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-server_address = "192.168.10.2"
+server_address = "192.168.10.3"
 port = 8080
 
 
@@ -72,15 +72,16 @@ def test3_up_and_down():
     time.sleep(10)
     header = create_header("move")
     position ="up"
-    for i in range(50):
-        if(i % 10 == 0):
+    for i in range(1,60):
+        if(i % 3 == 0):
             if(position == "up"):
                 position = "down"
             else:
                 position = "up"
         command = position.encode("utf-8")
         message = header + command
-        udp_client_socket.sendto(message,(server_address,port))    
+        udp_client_socket.sendto(message,(server_address,port))
+        time.sleep(0.5)    
     header = create_header("land")
     command = b"land"
     message = header + command
