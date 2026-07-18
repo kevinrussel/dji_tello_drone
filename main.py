@@ -21,7 +21,7 @@ class tello_class:
             timestamp,command_type,command_speed = (self.deal_with_packet(message))
             
             if timestamp > self.last_known_time:
-                message = [command_type,header_message]
+                message = [command_type,command_speed]
                 self.command_queue.put(message)
         
             
@@ -43,18 +43,15 @@ class tello_class:
                 break
             else:
                 command_type = command[0]
-                command = command[1]
-                if(command_type == 's'):
-                    if(command == "takeoff"):
-                        self.tello.takeoff()
-                    elif command == "land":
-                        self.tello.land()   
-                elif (command_type == 'd'):
-                    if command == "down":
-                        print("hitting")
-                        self.tello.send_rc_control(0,0,-80,0)
-                    elif command == "up":
-                        self.tello.send_rc_control(0,0,80,0)
+                command_speed = command[1]
+                if(command_type == 't'):
+                    self.tello.takeoff()
+                elif command_type == "l":
+                    self.tello.land()   
+                elif (command_type == 'm'):
+                    print(command_speed)
+                    self.tello.send_rc_control(0,0,command_speed,0)
+                    
 
 
     def main(self):
