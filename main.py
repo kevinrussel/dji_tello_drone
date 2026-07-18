@@ -18,7 +18,7 @@ class tello_class:
     def worker(self):
         while True:
             message,address = self.udp_server_socket.recvfrom(100)
-            timestamp,command_type,header_message =(self.deal_with_packet(message))
+            timestamp,command_type,header_message = (self.deal_with_packet(message))
             
             if timestamp > self.last_known_time:
                 
@@ -34,11 +34,9 @@ class tello_class:
             return Exception
 
     def deal_with_packet(self,message):
-        header = message[:9]
-        timestamp,command_type = struct.unpack("!Qc", header)
-        command_type = command_type.decode("utf-8")
-        header_message = (message[9:]).decode("utf-8")          
-        return timestamp,command_type,header_message 
+        timestamp,command_type,command_speed = struct.unpack("!Qch", message)
+        command_type = command_type.decode("utf-8")         
+        return timestamp,command_type,command_speed 
 
     def drone_commands(self):
         while True:
