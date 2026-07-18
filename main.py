@@ -13,6 +13,7 @@ class tello_class:
         self.udp_server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVBUF, 4 * 1024 * 1024)
         self.udp_server_socket.bind(('',8080))
         self.last_known_time = time.time_ns()
+        self.takeoff_initiated = False
 
 
     def worker(self):
@@ -45,13 +46,17 @@ class tello_class:
                 command_type = command[0]
                 command_speed = command[1]
                 if(command_type == 't'):
-                    self.tello.takeoff()
-                elif command_type == "l":
-                    self.tello.land()   
-                elif (command_type == 'm'):
-                    print(command_speed)
-                    self.tello.send_rc_control(0,0,command_speed,0)
-                    
+                    print("TAKEOFF")
+                    self.takeoff_initiated = True
+                    # self.tello.takeoff()
+                if(self.takeoff_initiated):                    
+                    if command_type == "l":
+                        print("LANDING")
+                        # self.tello.land()   
+                    elif (command_type == 'm'):
+                        print(command_speed)
+                        # self.tello.send_rc_control(0,0,command_speed,0)
+                        
 
 
     def main(self):
