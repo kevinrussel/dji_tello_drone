@@ -18,14 +18,12 @@ class tello_class:
     def worker(self):
         while True:
             message,address = self.udp_server_socket.recvfrom(100)
-            timestamp,command_type,header_message = (self.deal_with_packet(message))
+            timestamp,command_type,command_speed = (self.deal_with_packet(message))
             
             if timestamp > self.last_known_time:
-                
                 message = [command_type,header_message]
                 self.command_queue.put(message)
-            else:
-                continue
+        
             
     def start_drone(self):
         try:
