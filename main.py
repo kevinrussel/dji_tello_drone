@@ -53,7 +53,6 @@ class tello_class:
                     if command_type == "l":
                         self.tello.land()   
                     elif (command_type == 'm'):
-                        print(command_speed)
                         self.tello.send_rc_control(0,0,command_speed,0)
                         print(self.tello.get_speed_x())
                         
