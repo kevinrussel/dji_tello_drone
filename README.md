@@ -1,5 +1,9 @@
 # Hand Gesture Drone Controller
 
+Kevin Russel
+
+July/26/2026
+
 A computer-vision system that lets you control a drone's altitude (takeoff, land, ascend, descend, hold) using a single hand gesture in front of a webcam. Hand tracking is powered by [MediaPipe](https://google.github.io/mediapipe/solutions/hands.html) and [OpenCV](https://opencv.org/), and commands are streamed to the drone over UDP.
 
 The core idea: the distance between your **thumb tip** and **index finger tip** is measured, converted into a 0–100% "throttle" value, and mapped to a drone command that's packed into a binary UDP packet and sent to the drone's onboard receiver.
