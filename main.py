@@ -46,16 +46,16 @@ class tello_class:
                 command_type = command[0]
                 command_speed = command[1]
                 if(command_type == 't'):
-                    print("TAKEOFF")
-                    self.takeoff_initiated = True
-                    # self.tello.takeoff()
+                    if(not self.takeoff_initiated):
+                        self.takeoff_initiated = True
+                        self.tello.takeoff()
                 if(self.takeoff_initiated):                    
                     if command_type == "l":
-                        print("LANDING")
-                        # self.tello.land()   
+                        self.tello.land()   
                     elif (command_type == 'm'):
                         print(command_speed)
-                        # self.tello.send_rc_control(0,0,command_speed,0)
+                        self.tello.send_rc_control(0,0,command_speed,0)
+                        print(self.tello.get_speed_x())
                         
 
 
