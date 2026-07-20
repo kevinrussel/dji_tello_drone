@@ -1,33 +1,12 @@
-# Hand Gesture Drone Controller
+# Tello Drone UDP Command Receiver
 
-Kevin Russel
+This is the **drone-side companion service** to the hand-gesture controller project. It runs on a machine connected to a DJI Tello drone, listens for binary UDP command packets on the network, and translates them into real flight commands using the [`djitellopy`](https://github.com/damiafuentes/DJITelloPy) library.
 
-July/26/2026
+Together with the gesture-tracking client, the full pipeline looks like:
 
-A computer-vision system that lets you control a drone's altitude (takeoff, land, ascend, descend, hold) using a single hand gesture in front of a webcam. Hand tracking is powered by [MediaPipe](https://github.com/google-ai-edge/mediapipe) and [OpenCV](https://opencv.org/), and commands are streamed to the drone over UDP.
-
-The core idea: the distance between your **thumb tip** and **index finger tip** is measured, converted into a 0–100% "throttle" value, and mapped to a drone command that's packed into a binary UDP packet and sent to the drone's onboard receiver.
-
----
-
-## How It Works
-
-1. **Hand detection** — `handtrackingmodule.py` wraps MediaPipe's Hands solution to detect up to two hands per frame and expose the (x, y) pixel coordinates of all 21 landmarks per hand.
-2. **Gesture measurement** — `projecthand.py` reads landmark `4` (thumb tip) and landmark `8` (index tip) of the detected hand, and computes the Euclidean distance (hypotenuse) between them.
-3. **Percentage mapping** — that distance is linearly interpolated from a `[30, 270]` pixel range into a `[0, 100]` percentage range, representing how "open" the pinch gesture is.
-4. **Movement decision** — the percentage is translated into a drone command:
-
-   | Percentage | Movement | Speed |
-   |---|---|---|
-   | `0` | `LAND` | `0` |
-   | `1–40` | `DOWN` | interpolated `-80` to `-20` |
-   | `40–60` | `HOLD` | `0` |
-   | `60–99` | `UP` | interpolated `20` to `80` |
-   | `100` | `TAKEOFF` | `60` (sent once) |
-
-5. **Packet creation** — `create_header()` packs a binary UDP payload containing a nanosecond timestamp, a single-byte command type (`l` = land, `t` = takeoff, `m` = move), and the movement speed, using Python's `struct` module (`!Qch` format: unsigned long long, char, short).
-6. **Transmission** — the packed header is sent via a UDP socket to the drone's configured IP address and port.
-7. **Live visualization** — the current FPS, gesture percentage, movement state, a color-coded status label, and a vertical "throttle" bar are drawn onto the webcam feed in real time with OpenCV.
+```
+Webcam + Hand Gestures  --(UDP packets)-->  This Service  --(djitellopy API)-->  DJI Tello Drone
+```
 
 ---
 
@@ -35,83 +14,59 @@ The core idea: the distance between your **thumb tip** and **index finger tip** 
 
 ```
 .
-├── handtrackingmodule.py   # Hand detection wrapper around MediaPipe Hands
-└── projecthand.py          # Main application: gesture → command → UDP → drone
-```
-
-### `handtrackingmodule.py`
-
-Defines the `handDetector` class, which encapsulates MediaPipe's hand-tracking pipeline:
-
-- `findHands(image, draw)` — runs hand detection on a frame and optionally draws landmark connections on it.
-- `findposition(image)` — returns pixel-coordinate landmark lists for up to two detected hands (`left_hand`, `right_hand`), each formatted as `[id, x, y]` per landmark.
-- `draw_line(image, point1, point2)` — draws a line between two points (used to visualize the thumb-to-index gesture).
-- Includes a standalone `main()` for testing the module on its own (prints landmark 4 and overlays an FPS counter).
-
-### `projecthand.py`
-
-Defines the `Hand_Drone` class, which is the main application entry point:
-
-- **`__init__`** — configures the webcam capture (1000×1000), the `handDetector` instance, the drone's target UDP address/port, and the UDP socket.
-- **`calculate_hypot`** — computes the pixel distance between two points.
-- **`calculate_percentage`** — maps that distance to a 0–100 percentage.
-- **`drone_move_down` / `drone_move_up`** — compute proportional descent/ascent speeds.
-- **`drone_movement`** — decides the movement command and speed from the current percentage.
-- **`create_header`** — builds the binary UDP packet sent to the drone.
-- **`calculate_fps`** — tracks frames-per-second for on-screen display.
-- **`image_on_screen`** — renders the live overlay (FPS, percentage, movement label, color-coded throttle bar).
-- **`worker`** — the main loop: captures frames, runs detection, computes gestures, sends UDP commands, and renders the display.
-
----
-
-## Requirements
-
-- Python 3.x
-- [OpenCV](https://pypi.org/project/opencv-python/) (`opencv-python`)
-- [MediaPipe](https://pypi.org/project/mediapipe/)
-- [NumPy](https://pypi.org/project/numpy/)
-- A webcam
-- A drone (or receiver) listening for UDP packets on the configured IP/port
-
-Install dependencies:
-
-```bash
-pip install opencv-python mediapipe numpy
+├── main.py   # Production receiver: listens for UDP commands and drives the Tello
+└── test.py   # Standalone test scripts that simulate a client sending flight commands
 ```
 
 ---
 
-## Usage
+## `main.py` — Command Receiver
 
-1. Update the drone's target IP and port in `Hand_Drone.__init__`:
+Defines the `tello_class`, which runs two concurrent responsibilities:
 
-   ```python
-   self.server_address = "192.168.10.2"
-   self.port = 8080
-   ```
+1. **UDP listener** (`worker`) — binds a UDP socket to port `8080` with a 4 MB receive buffer, and continuously listens for incoming packets. Each packet is unpacked and, if its timestamp is newer than the last processed command, pushed onto a thread-safe `queue.Queue`.
+2. **Command executor** (`drone_commands`) — runs on the main thread, pulling commands off the queue one at a time and issuing the corresponding Tello SDK call:
 
-2. Run the controller:
+   | Command Type | Action |
+   |---|---|
+   | `t` | Takeoff (only triggered once, guarded by `takeoff_initiated`) |
+   | `l` | Land |
+   | `m` | Send RC control command — applies `command_speed` to the vertical (up/down) axis via `send_rc_control(0, 0, command_speed, 0)` |
 
-   ```bash
-   python projecthand.py
-   ```
+   Movement commands are only processed **after** takeoff has been initiated.
 
-3. Hold up **one hand** (with the other hand out of frame) in front of the webcam:
-   - Pinch your thumb and index finger together fully → **LAND**
-   - Keep them at a moderate distance → **HOLD**
-   - Slightly open → **DOWN** (proportional descent speed)
-   - More open → **UP** (proportional ascent speed)
-   - Fully spread apart → **TAKEOFF** (sent once per session)
+### Key methods
 
-4. Press the webcam window's close controls or interrupt the process (`Ctrl+C`) to stop.
+- **`__init__`** — connects to the Tello, opens and binds the UDP socket on port `8080`, and initializes state (`last_known_time`, `takeoff_initiated`).
+- **`worker()`** — runs in a background daemon thread; receives raw UDP packets, decodes them, and enqueues valid (newer) commands.
+- **`deal_with_packet(message)`** — unpacks the binary payload using `struct.unpack("!Qch", message)` into `(timestamp, command_type, command_speed)`, decoding the command type byte into a string.
+- **`drone_commands()`** — the main consumer loop that pulls from the queue and drives the drone via `djitellopy`.
+- **`start_drone()`** — establishes/re-establishes the Tello connection.
+- **`main()`** — entry point: starts the UDP listener thread, connects to the drone, and enters the command execution loop.
 
-> **Note:** Gesture tracking only activates when exactly one hand (mapped internally as the "left" hand slot) is visible and the other hand slot is empty — this is an intentional single-hand control scheme.
+---
+
+## `test.py` — Manual Test Client
+
+A standalone script (independent of `main.py`) for manually exercising the UDP protocol without needing the full hand-gesture pipeline. It builds and sends the same binary packet format directly to the drone's listening address (`192.168.10.2:8080`).
+
+### `create_header(flag)`
+
+Builds a UDP packet for a given command flag (`"takeoff"`, `"land"`, `"up"`, or default `"down"`), packing a timestamp, command-type byte, and a hardcoded speed value (`60` for takeoff/up, `-60` for down) using `struct.pack('!Qch', ...)`.
+
+### Test routines
+
+- **`test1_takeoff()`** — sends a takeoff command, waits 5 seconds, then sends a land command.
+- **`test2_altitude()`** — sends takeoff, waits 10 seconds, then sends a sequence of up/down movement commands with delays between each, finishing with land.
+- **`test3_up_and_down()`** — sends takeoff, then loops 29 times sending alternating up/down commands every 3 iterations with a 0.5 second delay between each, finishing with land. This simulates a sustained back-and-forth altitude oscillation.
+
+At the bottom of the file, `test3_up_and_down()` is the active call (the other two are commented out), so running the script executes that test by default.
 
 ---
 
 ## UDP Packet Format
 
-Each command sent to the drone is packed with:
+Both `main.py` and `test.py` use the same binary protocol as the hand-gesture client:
 
 ```
 struct.pack('!Qch', timestamp, command_type, movement_speed)
@@ -120,29 +75,56 @@ struct.pack('!Qch', timestamp, command_type, movement_speed)
 | Field | Type | Description |
 |---|---|---|
 | `timestamp` | `Q` (unsigned long long, 8 bytes) | Nanosecond timestamp (`time.time_ns()`) |
-| `command_type` | `c` (char, 1 byte) | `b'l'` = land, `b't'` = takeoff, `b'm'` = move |
-| `movement_speed` | `h` (short, 2 bytes) | Signed speed value, `-80` to `80` |
+| `command_type` | `c` (char, 1 byte) | `b't'` = takeoff, `b'l'` = land, `b'm'` = move |
+| `movement_speed` | `h` (short, 2 bytes) | Signed vertical speed, e.g. `-80` to `80` |
 
-All values are packed in network byte order (`!`).
+All fields are packed in network byte order (`!`).
+
+---
+
+## Requirements
+
+- Python 3.x
+- [`djitellopy`](https://pypi.org/project/djitellopy/)
+- A DJI Tello drone, connected to the same Wi-Fi network as the host machine
+
+Install dependencies:
+
+```bash
+pip install djitellopy
+```
 
 ---
 
-## On-Screen Display
+## Usage
 
-While running, the live camera feed shows:
+### Running the receiver
 
-- **FPS counter** (top-left)
-- **Gesture percentage** (0–100)
-- **Movement label** (`HOLD`, `UP`, `DOWN`, `TAKEOFF`, `LAND`), color-coded:
-  - Green — `HOLD`
-  - Red — `UP`
-  - Blue — `DOWN`
-  - Yellow — `TAKEOFF` / `LAND`
-- A **vertical throttle bar** that fills based on the current gesture percentage
-- A **connecting line** drawn between the thumb tip and index fingertip
+```bash
+python main.py
+```
+
+This connects to the Tello, opens a UDP listener on port `8080`, and waits for incoming command packets (e.g. from the hand-gesture controller).
+
+### Running a manual test
+
+Edit `test.py` to uncomment the desired test function at the bottom of the file, then run:
+
+```bash
+python test.py
+```
+
+Make sure `server_address` in `test.py` matches the IP address of the machine running `main.py`, and that `main.py` is already running and listening before the test script sends commands.
 
 ---
+
+## Notes
+
+- Takeoff is only ever triggered **once** per session (`takeoff_initiated`), preventing duplicate takeoff commands from repeated packets.
+- Movement (`m`) commands are ignored until takeoff has completed.
+- The UDP listener uses an enlarged 4 MB socket receive buffer to reduce the chance of dropped packets under load.
+- `main.py` and `test.py` are independent entry points — `test.py` is meant for manually validating the UDP protocol and drone response, not for production use alongside the real gesture client.
 
 ## Disclaimer
 
-This project sends real movement commands over the network. Test thoroughly in a safe, open environment before flying an actual drone, and ensure a manual override/failsafe is always available.
+This project issues live flight commands to a physical drone. Always test in a large, open, obstacle-free area, keep the drone within line of sight, and be ready to take manual control at any time.
