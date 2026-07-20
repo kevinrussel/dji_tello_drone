@@ -3,14 +3,14 @@
 This is the **drone-side companion service** to the hand-gesture controller project. It runs on a machine connected to a DJI Tello drone, listens for binary UDP command packets on the network, and translates them into real flight commands using the [`djitellopy`](https://github.com/damiafuentes/DJITelloPy) library.
 
 
-![Demo](README_docs/takeoff.gif)
+<img src="README_docs/takeoff.gif" alt="Demo" width="400" height="300">
 
 Together with the gesture-tracking client, the full pipeline looks like:
 
 ```
 Webcam + Hand Gestures  --(UDP packets)-->  This Service  --(djitellopy API)-->  DJI Tello Drone
 ```
-![Demo](README_docs/landing.gif)
+<img src="README_docs/landing.gif" alt="Demo" width="400" height="300">
 
 
 ---
