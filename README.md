@@ -3,7 +3,7 @@
 This is the **drone-side companion service** to the hand-gesture controller project. It runs on a machine connected to a DJI Tello drone, listens for binary UDP command packets on the network, and translates them into real flight commands using the [`djitellopy`](https://github.com/damiafuentes/DJITelloPy) library.
 
 
-<img src="README_docs/takeoff.gif" alt="Demo"  height="300">
+<img src="README_docs/takeoff.gif" alt="Demo" ` height="300">
 
 Together with the gesture-tracking client, the full pipeline looks like:
 
@@ -11,6 +11,8 @@ Together with the gesture-tracking client, the full pipeline looks like:
 Webcam + Hand Gestures  --(UDP packets)-->  This Service  --(djitellopy API)-->  DJI Tello Drone
 ```
 <img src="README_docs/landing.gif" alt="Demo"  height="300">
+
+
 
 
 ---
@@ -28,6 +30,8 @@ Webcam + Hand Gestures  --(UDP packets)-->  This Service  --(djitellopy API)--> 
 ## `main.py` — Command Receiver
 
 Defines the `tello_class`, which runs two concurrent responsibilities:
+
+<img src="README_docs/moving.gif" alt="Demo" ` height="300">
 
 1. **UDP listener** (`worker`) — binds a UDP socket to port `8080` with a 4 MB receive buffer, and continuously listens for incoming packets. Each packet is unpacked and, if its timestamp is newer than the last processed command, pushed onto a thread-safe `queue.Queue`.
 2. **Command executor** (`drone_commands`) — runs on the main thread, pulling commands off the queue one at a time and issuing the corresponding Tello SDK call:
